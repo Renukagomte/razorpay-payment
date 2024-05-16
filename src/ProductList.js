@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Grid, Rating, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Grid, Rating, Typography, useMediaQuery, useTheme, Badge } from '@mui/material'
 import axios from 'axios'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import { styled } from '@mui/material/styles';
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+    '& .MuiBadge-badge': {
+        right: -3,
+        top: -3,
+        border: `2px solid error`,
+        padding: '0 4px',
+    },
+}));
 
 const ProductList = () => {
     const theme = useTheme();
@@ -21,12 +31,13 @@ const ProductList = () => {
     }
     const addProductToCart = (item) => {
         setCartproducts(prevCartProducts => [...prevCartProducts, item]);
+    }
+    const buyNow = (item) => {
+        setCartproducts(prevCartProducts => [...prevCartProducts, item]);
         setshowCartItems(true)
     }
 
     const DELIVERY_CHARGE = 50;
-
-    // Calculate the total price including delivery charges
     const totalPrice = cartproducts.reduce((total, item) => {
         return total + item.price + DELIVERY_CHARGE;
     }, 0);
@@ -68,12 +79,14 @@ const ProductList = () => {
                         fontSize: "18px",
                         cursor: "pointer"
                     }}>Back</Typography>}
-                <Grid sx={{ display: "flex", cursor: "pointer" }}>
-                    <AddShoppingCartIcon />
-                    <Typography onClick={() => setshowCartItems(true)} sx={{
-                        fontSize: "18px"
-                    }}>cart</Typography>
-                </Grid>
+                <StyledBadge badgeContent={cartproducts.length} color="error">
+                    <Grid sx={{ display: "flex", cursor: "pointer" }}>
+                        <AddShoppingCartIcon />
+                        <Typography onClick={() => setshowCartItems(true)} sx={{
+                            fontSize: "18px"
+                        }}>cart</Typography>
+                    </Grid>
+                </StyledBadge>
 
             </Grid>
             {!showCartItems ? <>
@@ -154,13 +167,11 @@ const ProductList = () => {
                                             Add to cart
                                         </Box>
                                         <Box sx={{ backgroundColor: "#ffce32", width: "100px", color: "white", fontSize: "16px", textAlign: "center", borderRadius: "3px", fontWeight: 600, padding: "5px 5px" }}
-                                            onClick={() => addProductToCart(item)}
+                                            onClick={() => buyNow(item)}
                                         >
                                             Buy Now
                                         </Box>
                                     </Grid>
-
-
                                 </CardContent>
                             </CardActionArea>
                         </Card>
@@ -168,7 +179,7 @@ const ProductList = () => {
                 </Grid>
             </>
                 :
-                cartproducts.length > 0 ? <Grid display={"flex"} justifyContent={"center"} flexDirection={"column"} alignItems={"center"}marginY={"25px"} >
+                cartproducts.length > 0 ? <Grid display={"flex"} justifyContent={"center"} flexDirection={"column"} alignItems={"center"} marginY={"25px"} >
                     {
                         cartproducts.map((item, index) => <Grid sx={{ display: "flex", justifyContent: "center" }}>
                             <Card sx={{ display: 'flex', width: isSm ? "300px" : "600px", marginTop: "20px", height: isSm ? "150px" : "250px", display: "flex", alignItems: "center" }}>
@@ -230,7 +241,6 @@ const ProductList = () => {
                     }
                     <Card sx={{ width: isSm ? "300px" : "600px", marginY: "15px" }}>
                         <CardContent>
-
                             <Typography
                                 sx={{
                                     fontWeight: 600,
@@ -277,16 +287,13 @@ const ProductList = () => {
                     </Card>
 
                     <Button variant='contained' sx={{ width: isSm ? "100%" : "40%" }} onClick={handleRazorpay}>Place order</Button>
-                </Grid>:
-                <Grid sx={{display:"flex", justifyContent:"center", alignItems:"center", flexDirection:"column", height:"80vh"}}>
-                    <Typography sx={{fontSize:"20px",color: "#002f34",fontWeight:600 }}>Your cart is empty!</Typography>
-                    <Typography sx={{fontSize:"14px",color: "#002f34", }}>Add items to it now.</Typography>
-                    <Button sx={{marginTop:"10px"}} variant='contained' onClick={()=>setshowCartItems(false)}>Shop Now</Button>
-                </Grid>
-                }
-
-
-
+                </Grid> :
+                    <Grid sx={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", height: "80vh" }}>
+                        <Typography sx={{ fontSize: "20px", color: "#002f34", fontWeight: 600 }}>Your cart is empty!</Typography>
+                        <Typography sx={{ fontSize: "14px", color: "#002f34", }}>Add items to it now.</Typography>
+                        <Button sx={{ marginTop: "10px" }} variant='contained' onClick={() => setshowCartItems(false)}>Shop Now</Button>
+                    </Grid>
+            }
         </>
     )
 }
